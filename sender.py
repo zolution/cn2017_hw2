@@ -25,8 +25,9 @@ def make_packet(filename):
         if not content:
             break;
         single_packet = {"Type": "SEND", "Seq": len(packet)+1, "Payload": content}
-        print(single_packet)
+        print(len(pickle.dumps(single_packet)))
         packet.append(single_packet)
+    
     return packet
 
 
@@ -45,6 +46,7 @@ if __name__ == "__main__":
         for i in range(ptr, min(ptr+window, len(packet))):
             sent.append(packet[i]["Seq"])
             sock.sendto(pickle.dumps(packet[i]), (UDP_IP, UDP_AGENT_PORT))
+            
             if packet[i]["Seq"] not in overall_sent:
                 overall_sent.append(packet[i]["Seq"])
                 print("send\tdata\t#%d,\twinSize = %d" % (packet[i]["Seq"], window))
@@ -58,8 +60,9 @@ if __name__ == "__main__":
                 if recv_packet["Type"] != "ACK":
                     continue
                 if recv_packet["Seq"] in sent:
-                    sent.remove(recv_packet[seq])
-                print("recv\tack\t#%d" % (recv_packet[Seq]))
+                    sent.remove(recv_packet["Seq"])
+                print(len(sent))
+                print("recv\tack\t#%d" % (recv_packet["Seq"]))
             signal.alarm(0)
         except OSError:
             print("time\tout,\t\tthreshold = %d" % (Threshold))
@@ -69,7 +72,7 @@ if __name__ == "__main__":
             window = 1
         else:
             ptr += window
-            if window >= threshold:
+            if window >= Threshold:
                 window += 1
             else:
                 window *= 2

@@ -11,7 +11,7 @@ UDP_IP = "127.0.0.1"
 UDP_SENDER_PORT = 53000
 UDP_AGENT_PORT = 53100
 UDP_RECEIVER_PORT = 53200
-Drop_Rate = 20 # %
+Drop_Rate = 1 # %
 
 if __name__ == "__main__":
     random.seed()
@@ -32,12 +32,16 @@ if __name__ == "__main__":
             else:
                 sock.sendto(pickle.dumps(recv_packet), (UDP_IP, UDP_RECEIVER_PORT))
                 print("fwd\tdata\t#%d,\tloss rate = %.4f" % (recv_packet["Seq"], float(droped_n)/float(recved_n)))
-        elif recv_packet["TYPE"] in ["ACK", "FINACK"]:
-            print("get\t%s\t#%d" % (recv_packet["TYPE"].lower(), recv_packet["Seq"]))
+        elif recv_packet["Type"] == "ACK":
+            print("get\t%s\t#%d" % (recv_packet["Type"].lower(), recv_packet["Seq"]))
             sock.sendto(pickle.dumps(recv_packet), (UDP_IP, UDP_SENDER_PORT))
-            print("fwd\t%s\t#%d" % (recv_packet["TYPE"].lower(), recv_packet["Seq"]))
-        elif recv_packet["TYPE"] == "FIN":
-            print("get\tfin\t#%d" % recv_packet["Seq"])
+            print("fwd\t%s\t#%d" % (recv_packet["Type"].lower(), recv_packet["Seq"]))
+        elif recv_packet["Type"] == "FINACK":
+            print("get\tfinack")
+            sock.sendto(pickle.dumps(recv_packet), (UDP_IP, UDP_SENDER_PORT))
+            print("fwd\tfinack")
+        elif recv_packet["Type"] == "FIN":
+            print("get\tfin")
             sock.sendto(pickle.dumps(recv_packet), (UDP_IP, UDP_RECEIVER_PORT))
-            print("fwd\tfin\t#%d" % recv_packet["Seq"])
+            print("fwd\tfin")
 
