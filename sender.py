@@ -50,9 +50,8 @@ if __name__ == "__main__":
                 print("send\tdata\t#%d,\twinSize = %d" % (packet[i]["Seq"], window))
             else:
                 print("resnd\tdata\t#%d,\twinSize = %d" % (packet[i]["Seq"], window))
-
+        signal.alarm(1)
         try:
-            signal.alarm(1)
             while len(sent) > 0:
                 recvdata = sock.recv(1024)
                 recv_packet = pickle.loads(recvdata)
@@ -60,7 +59,7 @@ if __name__ == "__main__":
                     continue
                 if recv_packet["Seq"] in sent:
                     sent.remove(recv_packet[seq])
-                print("recv\tack\t#%d\n" % (recv_packet[Seq]))
+                print("recv\tack\t#%d" % (recv_packet[Seq]))
             signal.alarm(0)
         except OSError:
             print("time\tout,\t\tthreshold = %d" % (Threshold))
@@ -74,4 +73,18 @@ if __name__ == "__main__":
                 window += 1
             else:
                 window *= 2
-    
+    while True:
+        FIN_packet = {"Type": "FIN"}
+        sock.sendto(pickle.dumps(FIN_packet), (UDP_IP, UDP_AGENT_PORT))
+        print("send\tfin")
+        try:
+            recvdata = sock.recv(1024)
+            recv_packet = pickle.loads(recvdata)
+            if recv_packet["Type"] != "FINACK":
+                continue 
+            print("recv\tfinack")
+            signal.alarm(0)
+            exit()
+        except OSError:
+            print("time\tout,\t\tthreshold = %d" % (Threshold))
+
