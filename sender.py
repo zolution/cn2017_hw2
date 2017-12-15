@@ -60,7 +60,6 @@ if __name__ == "__main__":
                     continue
                 if recv_packet["Seq"] in sent:
                     sent.remove(recv_packet["Seq"])
-                print(len(sent))
                 print("recv\tack\t#%d" % (recv_packet["Seq"]))
             signal.alarm(0)
         except OSError:
