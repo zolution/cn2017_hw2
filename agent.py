@@ -14,6 +14,7 @@ UDP_RECEIVER_PORT = 53200
 Drop_Rate = 1 # %
 
 if __name__ == "__main__":
+    Drop_Rate = int(sys.argv[1])
     random.seed()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_AGENT_PORT))
