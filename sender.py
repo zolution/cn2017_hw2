@@ -25,7 +25,6 @@ def make_packet(filename):
         if not content:
             break;
         single_packet = {"Type": "SEND", "Seq": len(packet)+1, "Payload": content}
-        print(len(pickle.dumps(single_packet)))
         packet.append(single_packet)
     
     return packet
